@@ -1,4 +1,3 @@
-from time import sleep
 import time
 import pytest
 from selenium import webdriver
@@ -78,7 +77,6 @@ def test_itcareerhub(driver):
 
     time.sleep(2)
 
-
     assert "itcareerhub.de/ru" in driver.current_url
     assert "/ru" in driver.current_url
 
@@ -98,10 +96,9 @@ def test_itcareerhub(driver):
     wait.until(lambda d: "contact" in d.current_url)
     time.sleep(2)
 
-
     # Клик по кнопке "Обратный звонок"
     callback = driver.find_element(By.LINK_TEXT, "ОБРАТНЫЙ ЗВОНОК")
-    driver.execute_script( "arguments[0].scrollIntoView({block: 'center'});",callback)
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", callback)
     wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "ОБРАТНЫЙ ЗВОНОК")))
     driver.execute_script("arguments[0].click();", callback)
     time.sleep(2)
