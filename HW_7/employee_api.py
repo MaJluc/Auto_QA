@@ -43,6 +43,38 @@ class EmployeeApi:
 
         return resp.json() if resp.status_code == 200 else None
 
+    # def get_employees(self):
+    #     # Пробуем разные возможные endpoint'ы
+    #     endpoints = ['/employee/list', '/employee', '/employees']
+    #     for endpoint in endpoints:
+    #         resp = requests.get(self.url + endpoint)
+    #         if resp.status_code == 200:
+    #             print(f"Найден рабочий endpoint: {endpoint}")
+    #             return resp.json()
+    #     print("Не найден рабочий endpoint для списка сотрудников")
+    #     return None
+
+    def find_employee_by_email(self, email):
+        # Перебираем ID с 1, пока не найдём нужный email
+        employee_id = 1
+        max_attempts = 100  # Защита от бесконечного цикла
+
+        while employee_id <= max_attempts:
+            try:
+                employee = self.get_employee_by_id(employee_id)
+                if employee.get("email") == email:
+                    print(f"Найден сотрудник с ID {employee_id}")
+                    employee["id"] = employee_id
+
+                    return employee
+            except:
+                # Если сотрудник не существует, продолжаем поиск
+                pass
+            employee_id += 1
+
+        print(f"Сотрудник с email {email} не найден в первых {max_attempts} ID")
+        return None
+
     def create_company(self, company_data, user=None, password=None):
         url = self.url + '/company/create'
         if user and password:

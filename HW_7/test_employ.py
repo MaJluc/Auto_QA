@@ -1,11 +1,12 @@
 from employee_api import EmployeeApi
+import pytest
 
 
 base_url = "http://5.101.50.27:8000"
 api = EmployeeApi(base_url)
 
-def test_create_employee():
-    # Create a new company to get its ID
+@pytest.fixture(scope="module")  # Fixture для создания сотрудника и возврата его email
+def employee_email():
     company_data = {
         "name": "Maxxwell",
         "description": "Company for employee creation"
@@ -30,16 +31,35 @@ def test_create_employee():
     new_employee = api.create_employ(data_json=employee_json, user="harrypotter", password="expelliarmus")
 
     assert new_employee["first_name"] == "Maxx"
+    # print(f"Создан сотрудник с ID: {new_employee.get('id')}")
+    print(f"Email сотрудника: {employee_json['email']}")
 
+    return employee_json['email']
 
+def test_create_employee(employee_email):
+    assert employee_email == "maxx@example.com"
 
-def test_get_employee():
-    employee_info = api.get_employee_by_id(8)
+def test_get_employee(employee_email):
+    employee = api.find_employee_by_email(employee_email)
+    if not employee:
+        raise Exception(f"Сотрудник с email {employee_email} не найден")
+
+    employee_id = employee["id"]
+    print(f"Найден сотрудник с ID: {employee_id}")
+
+    employee_info = api.get_employee_by_id(employee_id)
 
     assert employee_info["first_name"] == "Maxx"
 
 
-def test_edit_employee():
-    mod_employee = api.edit_employee(8, "Bugger", "harrypotter","expelliarmus")
+def test_edit_employee(employee_email):
+    employee = api.find_employee_by_email(employee_email)
+    if not employee:
+        raise Exception(f"Сотрудник с email {employee_email} не найден")
+
+    employee_id = employee["id"]
+    print(f"Найден сотрудник с ID: {employee_id}")
+
+    mod_employee = api.edit_employee(employee_id, "Bugger", "harrypotter","expelliarmus")
 
     assert mod_employee["last_name"] == "Bugger"
